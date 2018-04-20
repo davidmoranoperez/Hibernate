@@ -6,21 +6,20 @@ import org.hibernate.Session;
 
 import es.aytos.hibernate.hibernate_dual.modelo.EstadoCivil;
 import es.aytos.hibernate.hibernate_dual.modelo.Persona;
+import es.aytos.hibernate.hibernate_dual.modelo.Cliente;
 import es.aytos.hibernate.hibernate_dual.util.HibernateUtil;
 
 public class RepositorioPersona {
 
-	public static Integer crearPersona(final Persona persona) {
+	public static void crearPersona(final Persona persona) {
 		final Session sesion = HibernateUtil.getMiFactoria().getCurrentSession();
 
 		try {
 			sesion.beginTransaction();
 
-			final Integer idPersona = (Integer) sesion.save(persona);
+			sesion.save(persona);
 
 			sesion.getTransaction().commit();
-
-			return idPersona;
 
 		} catch (Exception e) {
 			System.out.println("Se ha producido un error insertando la persona: " + e.getMessage());
@@ -46,7 +45,7 @@ public class RepositorioPersona {
 			sesion.saveOrUpdate(persona);
 			sesion.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("Se ha producido un error insertando la persona: " + e.getMessage());
+			System.out.println("Se ha producido un error modificar la persona: " + e.getMessage());
 			e.printStackTrace();
 			throw new RuntimeException();
 		} finally {
@@ -60,18 +59,20 @@ public class RepositorioPersona {
 		try {
 			sesion.beginTransaction();
 
-			sesion.createQuery("Update Persona set per_nom =:nombre where per_id = :identificador")
-					.setParameter("nombre", nombre).setParameter("identificador", idPersona).executeUpdate();
+			// sesion.createQuery("Update Persona set per_nom =:nombre where usu_id =
+			// :identificador")
+			// .setParameter("nombre", nombre).setParameter("identificador",
+			// idPersona).executeUpdate();
 
-			// final Persona personaBBDD = (Persona) sesion.createQuery("from Persona where
-			// PER_ID = :identificador")
-			// .setParameter("identificador", idPersona).uniqueResult();
-			//
-			// personaBBDD.setNombre(nombre);
+			final Persona personaBBDD = (Persona) sesion
+					.createQuery("from Usuario usuario where usuario.idUsuario = :identificador")
+					.setParameter("identificador", idPersona).uniqueResult();
+
+			personaBBDD.setNombre(nombre);
 
 			sesion.getTransaction().commit();
 		} catch (Exception e) {
-			System.out.println("Se ha producido un error insertando la persona: " + e.getMessage());
+			System.out.println("Se ha producido un error al modificar el nombre de la persona: " + e.getMessage());
 			e.printStackTrace();
 			throw new RuntimeException();
 		} finally {
@@ -108,7 +109,7 @@ public class RepositorioPersona {
 		try {
 			sesion.beginTransaction();
 
-			sesion.createQuery("Delete Persona where per_id = :identificador").setParameter("identificador", idPersona)
+			sesion.createQuery("Delete Usuario where usu_id = :identificador").setParameter("identificador", idPersona)
 					.executeUpdate();
 
 			// final Persona personaBBDD = (Persona) sesion.createQuery("from Persona where
@@ -133,7 +134,7 @@ public class RepositorioPersona {
 		try {
 			sesion.beginTransaction();
 
-			return (String) sesion.createQuery("select nombre from Persona where per_id = :identificador")
+			Persona persona = (Persona) sesion.createQuery("select nombre from Persona where per_id = :identificador")
 					.setParameter("identificador", idPersona).uniqueResult();
 
 			// final Persona personaBBDD = (Persona) sesion.createQuery("from Persona where
@@ -141,6 +142,9 @@ public class RepositorioPersona {
 			// .setParameter("identificador", idPersona).uniqueResult();
 			//
 			// personaBBDD.setNombre(nombre);
+			//persona.getTelefonos().stream().forEach(telefono -> System.out.println(telefono.getNumero()));
+			
+			return persona.getNombre();
 		} catch (Exception e) {
 			System.out.println("Se ha producido un error insertando la persona: " + e.getMessage());
 			e.printStackTrace();
@@ -156,13 +160,14 @@ public class RepositorioPersona {
 		try {
 			sesion.beginTransaction();
 
-			return (Persona) sesion.createQuery("from Persona where per_id = :identificador")
+			return (Persona) sesion.createQuery("from Persona where PER_ID = :identificador")
 					.setParameter("identificador", idPersona).uniqueResult();
 
-			// final Persona personaBBDD = (Persona) sesion.createQuery("from Persona where
-			// PER_ID = :identificador")
-			// .setParameter("identificador", idPersona).uniqueResult();
-			//
+//			 final Persona personaBBDD = (Persona) sesion.createQuery("from Persona where PER_DNI = :identificador")
+//			 .setParameter("identificador", idPersona).uniqueResult();
+//			 
+//			 return personaBBDD;
+			
 			// personaBBDD.setNombre(nombre);
 		} catch (Exception e) {
 			System.out.println("Se ha producido un error insertando la persona: " + e.getMessage());
